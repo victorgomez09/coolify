@@ -1,15 +1,25 @@
 import { FormErrors, email, equal, register, required, useForm } from "@esmo/react-utils/forms";
-import { useNavigate } from "@esmo/react-utils/router";
+import { Link, useNavigate } from "@esmo/react-utils/router";
+import { useMutation } from "@esmo/react-utils/state";
 
 import { IRegister } from "../models/auth.model";
 import { register as registerUser } from "../services/auth.service";
 import { ThemeSwitcher } from "../components/theme-switcher.component";
+import { Loading } from "../components/loading.component";
+import { useLocalStorage } from "@esmo/react-utils/hooks";
+import { auth } from "../constants/auth.constants";
 
 export default function SignUpView() {
-    const navigate = useNavigate('/landing');
+    const navigate = useNavigate('/');
+    const [_, setToken] = useLocalStorage(auth.token, "");
     const { field, submit, errors, hasError, getError } = useForm<IRegister>({
         onSubmit(values) {
-            registerUser(values)
+            mutate(values);
+
+            if (isSuccess) {
+                setToken(data.token);
+                navigate();
+            }
         },
         onValidate(values) {
             const formErrors: FormErrors<IRegister> = new Map();
@@ -25,7 +35,10 @@ export default function SignUpView() {
         },
         isValidateAfterTouch: true,
         isValidateOnChange: true
-    })
+    });
+    const { data, error, mutate, isMutating, isSuccess } = useMutation(registerUser)
+
+    if (isMutating) return <Loading />
 
     return (
         <div className="flex flex-1 flex-col">
@@ -37,23 +50,23 @@ export default function SignUpView() {
                 <div className="flex flex-col h-full lg:max-w-2xl">
                     <div className="flex flex-row p-8 items-center space-x-3 justify-between">
 
-                        <div className="icons cursor-pointer" onClick={navigate}>
+                        <Link className="icons cursor-pointer" to="/landing">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-6 w-6"
                                 viewBox="0 0 24 24"
-                                stroke-width="1.5"
+                                strokeWidth="1.5"
                                 stroke="currentColor"
                                 fill="none"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             >
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <line x1="5" y1="12" x2="19" y2="12" />
                                 <line x1="5" y1="12" x2="11" y2="18" />
                                 <line x1="5" y1="12" x2="11" y2="6" />
                             </svg>
-                        </div>
+                        </Link>
                         <div className="flex flex-row items-center space-x-3">
                             <ThemeSwitcher />
                         </div>
@@ -111,6 +124,14 @@ export default function SignUpView() {
                     </div>
                 </div>
             </div>
+
+            {error && (
+                <div className="toast toast-top toast-end">
+                    <div className="alert alert-error">
+                        <span>Oops! Something goes wrong.</span>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

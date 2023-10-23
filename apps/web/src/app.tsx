@@ -3,7 +3,8 @@ import { Suspense, lazy } from 'react'
 
 import { PrivateRoute } from './routes/private.route'
 import { PublicRoute } from './routes/public.route'
-import { LoadingComponent } from './components/loading.component'
+import { Loading } from './components/loading.component'
+import { QueryProvider } from '@esmo/react-utils/state'
 
 const SignInView = lazy(() => import('./views/sign-in.view'))
 const SignUpView = lazy(() => import('./views/sign-up.view'))
@@ -11,14 +12,16 @@ const HomeView = lazy(() => import('./views/home.view'))
 
 function App() {
   return (
-    <Suspense fallback={<LoadingComponent />}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" children={<PrivateRoute children={<HomeView />} />} />
-          <Route path="/signin" children={<PublicRoute children={<SignInView />} />} />
-          <Route path="/signup" children={<PublicRoute children={<SignUpView />} />} />
-        </Routes>
-      </BrowserRouter>
+    <Suspense fallback={<Loading />}>
+      <QueryProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" children={<PrivateRoute children={<HomeView />} />} />
+            <Route path="/signin" children={<PublicRoute children={<SignInView />} />} />
+            <Route path="/signup" children={<PublicRoute children={<SignUpView />} />} />
+          </Routes>
+        </BrowserRouter>
+      </QueryProvider>
     </Suspense>
   )
 }

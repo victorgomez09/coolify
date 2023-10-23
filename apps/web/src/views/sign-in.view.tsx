@@ -4,12 +4,17 @@ import { useNavigate } from "@esmo/react-utils/router";
 import { ILogin } from "../models/auth.model";
 import { login } from "../services/auth.service";
 import { ThemeSwitcher } from "../components/theme-switcher.component";
+import { useMutation } from "@esmo/react-utils/state";
+import { useIsomorphicLayoutEffect } from "@esmo/react-utils/hooks";
+import { auth } from "../constants/auth.constants";
+import { Loading } from "../components/loading.component";
 
 export default function SignInView() {
-    const navigate = useNavigate('/landing');
+    const navigate = useNavigate('/');
+    // const [_, setToken] = useLocalStorage(auth.token, "");
     const { field, submit, errors, hasError, getError } = useForm<ILogin>({
         onSubmit(values) {
-            login(values)
+            mutate(values);
         },
         onValidate(values) {
             const formErrors: FormErrors<ILogin> = new Map();
@@ -23,7 +28,26 @@ export default function SignInView() {
         },
         isValidateAfterTouch: true,
         isValidateOnChange: true
-    })
+    });
+
+    const { data, error, mutate, isMutating, isSuccess } = useMutation(login);
+
+    useIsomorphicLayoutEffect(() => {
+        console.log('data', data)
+    }, [data])
+
+    useIsomorphicLayoutEffect(() => {
+        console.log('isSuccess', isSuccess)
+    }, [isSuccess])
+
+    if (isMutating) return <Loading />;
+
+    if (isSuccess) {
+        // setToken(data.token);
+        localStorage.setItem(auth.token, data.token)
+
+        navigate();
+    }
 
     return (
         <div className="flex flex-1 flex-col">
@@ -40,11 +64,11 @@ export default function SignInView() {
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-6 w-6"
                                 viewBox="0 0 24 24"
-                                stroke-width="1.5"
+                                strokeWidth="1.5"
                                 stroke="currentColor"
                                 fill="none"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             >
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <line x1="5" y1="12" x2="19" y2="12" />
@@ -97,6 +121,14 @@ export default function SignInView() {
                     </div>
                 </div>
             </div>
+
+            {error && (
+                <div className="toast toast-top toast-end">
+                    <div className="alert alert-error">
+                        <span>Oops! Something goes wrong.</span>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

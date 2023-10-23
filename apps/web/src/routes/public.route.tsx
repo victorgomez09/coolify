@@ -6,11 +6,10 @@ type Props = {
     children: JSX.Element
 }
 
-export function PublicRoute({children}: Props) {
+export function PublicRoute({ children }: Props) {
     const [token] = useLocalStorage<string>(auth.token, "");
     const navigate = useNavigate('/');
 
-    console.log('token', token)
     if (token) navigate();
 
     return children;
