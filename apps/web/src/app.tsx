@@ -5,6 +5,7 @@ import { PrivateRoute } from './routes/private.route'
 import { PublicRoute } from './routes/public.route'
 import { LoadingComponent } from './components/loading.component'
 
+const SignInView = lazy(() => import('./views/sign-in.view'))
 const SignUpView = lazy(() => import('./views/sign-up.view'))
 const HomeView = lazy(() => import('./views/home.view'))
 
@@ -14,6 +15,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" children={<PrivateRoute children={<HomeView />} />} />
+          <Route path="/signin" children={<PublicRoute children={<SignInView />} />} />
           <Route path="/signup" children={<PublicRoute children={<SignUpView />} />} />
         </Routes>
       </BrowserRouter>
