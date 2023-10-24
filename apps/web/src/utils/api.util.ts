@@ -8,7 +8,7 @@ type Props<T> = {
 }
 
 export const send = async <INPUT, OUTPUT>({ endpoint, method, payload }: Props<INPUT>): Promise<OUTPUT> => {
-    const result = await fetch(`${api.url}${endpoint}`, {
+    const response = await fetch(`${api.url}${endpoint}`, {
         method,
         headers: {
             'Authorization': `Bearer ${localStorage.getItem(auth.token)!}`
@@ -16,5 +16,16 @@ export const send = async <INPUT, OUTPUT>({ endpoint, method, payload }: Props<I
         body: JSON.stringify(payload)
     });
 
-    return await result.json() as Promise<OUTPUT>;
+    const contentType = response.headers.get('content-type');
+    if (contentType) {
+        if (contentType?.indexOf('application/json') !== -1) {
+            return await response.json();
+        } else if (contentType?.indexOf('text/plain') !== -1) {
+            return await response.text() as OUTPUT;
+        } else {
+            return {} as OUTPUT;
+        }
+    } else {
+        return {} as OUTPUT;
+    }
 }

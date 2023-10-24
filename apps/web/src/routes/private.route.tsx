@@ -22,10 +22,10 @@ export function PrivateRoute({ children }: Props) {
     }
 
     return (
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col h-full">
             <Navbar />
 
-            <div className="p-2 overflow-auto">
+            <div className="p-2 overflow-auto h-full w-full">
                 {children}
             </div>
         </div>
