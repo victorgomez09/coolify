@@ -1,7 +1,7 @@
 import { Team } from "./team.model"
 
 interface Account {
-    id: string,
+    id: number,
     email: string,
     teams: Team[]
 }

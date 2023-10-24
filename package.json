@@ -24,7 +24,7 @@
     "dev": "run-p -l -n dev:api dev:ui",
     "dev:api": "NODE_ENV=development pnpm run --filter api dev",
     "dev:server": "NODE_ENV=development pnpm run --filter server dev",
-    "dev:client": "NODE_ENV=development pnpm run --filter client dev",
+    "dev:web": "NODE_ENV=development pnpm run --filter web dev",
     "dev:ui": "NODE_ENV=development pnpm run --filter ui dev",
     "build-trpc": "NODE_ENV=production pnpm run --filter server build && pnpm run --filter client build && cp ./apps/server/package.json build/ && cd build/ && pnpm install -p .",
     "start-trpc": "NODE_ENV=production node build/index.js",

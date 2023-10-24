@@ -1,13 +1,14 @@
 import { FormErrors, email, register, required, useForm } from "@esmo/react-utils/forms";
 import { useNavigate } from "@esmo/react-utils/router";
+import { useMutation } from "@esmo/react-utils/state";
 
+import { Loading } from "../components/loading.component";
+import { ThemeSwitcher } from "../components/theme-switcher.component";
+import { auth } from "../constants/auth.constants";
 import { ILogin } from "../models/auth.model";
 import { login } from "../services/auth.service";
-import { ThemeSwitcher } from "../components/theme-switcher.component";
-import { useMutation } from "@esmo/react-utils/state";
-import { useIsomorphicLayoutEffect } from "@esmo/react-utils/hooks";
-import { auth } from "../constants/auth.constants";
-import { Loading } from "../components/loading.component";
+import { getMe } from "../services/user.service";
+import { useUserStore } from "../store/user.store";
 
 export default function SignInView() {
     const navigate = useNavigate('/');
@@ -29,24 +30,19 @@ export default function SignInView() {
         isValidateAfterTouch: true,
         isValidateOnChange: true
     });
-
     const { data, error, mutate, isMutating, isSuccess } = useMutation(login);
-
-    useIsomorphicLayoutEffect(() => {
-        console.log('data', data)
-    }, [data])
-
-    useIsomorphicLayoutEffect(() => {
-        console.log('isSuccess', isSuccess)
-    }, [isSuccess])
+    const { setUser } = useUserStore(state => [state.user, state.setUser]);
 
     if (isMutating) return <Loading />;
 
     if (isSuccess) {
-        // setToken(data.token);
-        localStorage.setItem(auth.token, data.token)
+        localStorage.setItem(auth.token, data.token);
 
-        navigate();
+        getMe().then((data) => {
+            setUser(data);
+        }).finally(() => {
+            navigate();
+        });
     }
 
     return (

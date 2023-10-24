@@ -1,15 +1,33 @@
+import { Redirect } from "@esmo/react-utils/router";
+
+import { Navbar } from "../components/navbar.component";
 import { auth } from "../constants/auth.constants";
-import { useNavigate } from "@esmo/react-utils/router";
+import { getMe } from "../services/user.service";
+import { useUserStore } from "../store/user.store";
 
 type Props = {
     children: JSX.Element
 }
 
 export function PrivateRoute({ children }: Props) {
-    const navigate = useNavigate('/signin');
+    const { user, setUser } = useUserStore(state => [state.user, state.setUser]);
     const token = localStorage.getItem(auth.token);
 
-    if (!token) navigate();
+    if (!token) return <Redirect href="/signin" />
 
-    return children;
+    if (!user || user.account.email === "") {
+        getMe().then((data) => {
+            setUser(data);
+        });
+    }
+
+    return (
+        <div className="flex flex-1 flex-col">
+            <Navbar />
+
+            <div className="p-2 overflow-auto">
+                {children}
+            </div>
+        </div>
+    );
 }

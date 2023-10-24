@@ -1,3 +1,4 @@
+import { SSH } from "./ssh.model";
 import { Team } from "./team.model";
 
 export interface Destination {
@@ -15,5 +16,6 @@ export interface Destination {
     updatedAt: Date,
     sshKeyId: string,
     sshLocalPort: number,
+    sshKey: SSH,
     teams: Team[]
 }

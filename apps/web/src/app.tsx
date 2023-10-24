@@ -5,6 +5,7 @@ import { PrivateRoute } from './routes/private.route'
 import { PublicRoute } from './routes/public.route'
 import { Loading } from './components/loading.component'
 import { QueryProvider } from '@esmo/react-utils/state'
+import DestinationsView from './views/destination.view'
 
 const SignInView = lazy(() => import('./views/sign-in.view'))
 const SignUpView = lazy(() => import('./views/sign-up.view'))
@@ -17,6 +18,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" children={<PrivateRoute children={<HomeView />} />} />
+            <Route path="/destinations/:id" children={<PrivateRoute children={<DestinationsView />} />} />
             <Route path="/signin" children={<PublicRoute children={<SignInView />} />} />
             <Route path="/signup" children={<PublicRoute children={<SignUpView />} />} />
           </Routes>
