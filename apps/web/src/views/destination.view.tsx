@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useRouteMatch } from "@esmo/react-utils/router";
+import { useNavigate, useRouteMatch } from "@esmo/react-utils/router";
 import { useMutation, useQuery, useQueryMagic } from "@esmo/react-utils/state";
 import { FormErrors, register, required, useForm } from "@esmo/react-utils/forms";
 import { useIsomorphicLayoutEffect } from "@esmo/react-utils/hooks";
 import { PiTrash } from 'react-icons/pi';
 
 import { Loading } from "../components/loading.component";
-import { changeDestinationSettings, forceDestinationProxyRestart, getDestination, getDestinationStatus, startDestinationProxy, stopDestinationProxy as stopDestinationProxy, updateDestination } from "../services/destinations.service";
+import { changeDestinationSettings, deleteDestination, deleteDestinationForce, forceDestinationProxyRestart, getDestination, getDestinationStatus, startDestinationProxy, stopDestinationProxy as stopDestinationProxy, updateDestination } from "../services/destinations.service";
 import { Destination } from "../models/destination.model";
 import { Info } from "../components/info.component";
 import { Setting } from "../models/setting.model";
@@ -24,6 +24,7 @@ type DestinationForm = {
 
 export default function DestinationsView() {
     const { params } = useRouteMatch()!;
+    const navigate = useNavigate('/');
     const { invalidateQuery, getQueryData, setQueryData, cancelQuery } = useQueryMagic();
     const { data, error, isLoading, isSuccess } = useQuery<{ destination: Destination, settings: Setting }>(["get-destination"], () => getDestination(params.id!))
     const { data: statusData, error: statusError, isLoading: statusIsLoading } = useQuery<{ isRunning: boolean }>(["get-destination-status", data?.destination.id], () => getDestinationStatus(params.id!), {
@@ -92,7 +93,39 @@ export default function DestinationsView() {
             setStartProxyToast(true);
         }
     });
-    const { mutate: destinationMutate } = useMutation<{ id: string, destination: Destination }>(updateDestination, {
+    const { mutate: updateMutate } = useMutation<{ id: string, destination: Destination }>(updateDestination, {
+        // async onMutate() {
+        //     const prevDest = getQueryData(`get-destination`);
+        //     await cancelQuery(`get-destination`);
+        //     setQueryData(`get-destination`, (old: Destination) => ({ ...old, isCoolifyProxyUsed: data!.destination.isCoolifyProxyUsed }));
+
+        //     return { prevDest };
+        // },
+        // onError(_err, _newDest, context) {
+        //     console.log('err', _err)
+        //     setQueryData(`get-destination`, context.prevDest);
+        // },
+        // onSettled() {
+        //     invalidateQuery(`get-destination`);
+        // }
+    });
+    const { mutate: deleteMutate } = useMutation<{ id: string }>(deleteDestination, {
+        // async onMutate() {
+        //     const prevDest = getQueryData(`get-destination`);
+        //     await cancelQuery(`get-destination`);
+        //     setQueryData(`get-destination`, (old: Destination) => ({ ...old, isCoolifyProxyUsed: data!.destination.isCoolifyProxyUsed }));
+
+        //     return { prevDest };
+        // },
+        // onError(_err, _newDest, context) {
+        //     console.log('err', _err)
+        //     setQueryData(`get-destination`, context.prevDest);
+        // },
+        // onSettled() {
+        //     invalidateQuery(`get-destination`);
+        // }
+    });
+    const { mutate: deleteForceMutate } = useMutation<{ id: string }>(deleteDestinationForce, {
         // async onMutate() {
         //     const prevDest = getQueryData(`get-destination`);
         //     await cancelQuery(`get-destination`);
@@ -117,12 +150,19 @@ export default function DestinationsView() {
             return formErrors;
         },
         onSubmit: (values) => {
-            data!.destination.name = values.name;
-            console.log('destination', data!.destination)
-            destinationMutate({
-                id: params.id!,
-                destination: { ...data!.destination }
-            });
+            try {
+                data!.destination.name = values.name;
+                console.log('destination', data!.destination)
+                updateMutate({
+                    id: params.id!,
+                    destination: data!.destination
+                });
+
+                console.log('destinationSuccess', destinationSuccess)
+
+            } catch (err) {
+                console.log('err', err)
+            }
         },
         isValidateAfterTouch: true,
         isValidateOnChange: true
@@ -151,7 +191,7 @@ export default function DestinationsView() {
                 })
             }
         }
-    }, [data, isSuccess])
+    }, [data, isSuccess]);
 
     const changeProxySetting = async () => {
         const isProxyActivated = data?.destination.isCoolifyProxyUsed;
@@ -215,6 +255,62 @@ export default function DestinationsView() {
         }
     }
 
+    const isDestinationDeletable =
+        (data?.destination?.application.length === 0 &&
+            data?.destination?.database.length === 0 &&
+            data?.destination?.service.length === 0) ||
+        true;
+
+    const delDestination = async () => {
+        if (!isDestinationDeletable) return;
+        const sure = confirm(`Are you sure you would like to delete ${data!.destination.name}`);
+        if (sure) {
+            try {
+                deleteMutate({
+                    id: data!.destination.id
+                });
+
+                navigate();
+            } catch (error) {
+                console.log('error', error)
+            }
+        }
+    }
+    const forceDeleteDestination = async () => {
+        let sure = confirm(`Are you sure you would like to delete ${data!.destination.name}`);
+        if (sure) {
+            sure = confirm(
+                'Are you REALLY sure? This will delete all resources associated with this destination, but not on the destination (server) itself. You will have manually delete everything on the server afterwards.'
+            );
+            if (sure) {
+                sure = confirm('REALLY?');
+                if (sure) {
+                    try {
+                        deleteForceMutate({
+                            id: data!.destination.id
+                        });
+
+                        navigate();
+                        // await del(`/destinations/${destination.id}/force`, { id: destination.id });
+                        // return await goto('/', { replaceState: true });
+                    } catch (error) {
+                        console.log('error', error);
+                    }
+                }
+            }
+        }
+    }
+    function deletable() {
+        if (!isDestinationDeletable) {
+            return 'Please delete all resources before deleting this.';
+        }
+        // if ($appSession.isAdmin) {
+        //     return $t('destination.delete_destination');
+        // } else {
+        //     return $t('destination.permission_denied_delete_destination');
+        // }
+    }
+
     if (isLoading || statusIsLoading) return <Loading />;
 
     return (
@@ -227,13 +323,13 @@ export default function DestinationsView() {
 
                 <div>
                     <div className="tooltip tooltip-primary tooltip-left" data-tip="Delete">
-                        <button className="btn btn-ghost btn-primary">
+                        <button className="btn btn-ghost btn-primary" onClick={delDestination} disabled={!isDestinationDeletable}>
                             <PiTrash />
                         </button>
                     </div>
 
                     <div className="tooltip tooltip-primary tooltip-left" data-tip="Force delete">
-                        <button className="btn bg-transparent text-red-500">
+                        <button className="btn bg-transparent text-red-500" onClick={forceDeleteDestination} disabled={!isDestinationDeletable}>
                             <PiTrash />
                         </button>
                     </div>

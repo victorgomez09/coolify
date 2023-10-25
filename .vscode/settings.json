@@ -27,5 +27,20 @@
 		"**/.DS_Store": true,
 		"**/Thumbs.db": true
 	},
-	"hide-files.files": []
+	"hide-files.files": [],
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"driver": "SQLite",
+			"name": "vira-paas",
+			"database": "C:\\Users\\viti\\Desktop\\Proyectos\\vira-paas\\apps\\api\\db\\dev.db"
+		},
+		{
+			"previewLimit": 50,
+			"driver": "SQLite",
+			"name": "test",
+			"database": "\\\\wsl.localhost\\Debian\\home\\viti\\projects\\vira-paas\\apps\\api\\db\\dev.db"
+		}
+	],
+	"sqltools.useNodeRuntime": true
 }

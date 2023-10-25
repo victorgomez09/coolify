@@ -1,12 +1,12 @@
 import { useQuery } from "@esmo/react-utils/state"
-import { getResources } from "../services/resources.service"
+import { Link } from "@esmo/react-utils/router"
 
+import { getResources } from "../services/resources.service"
 import { Loading } from "../components/loading.component"
 import { Resource } from "../models/resource.model"
 import { useUserStore } from "../store/user.store"
-import { Link } from "@esmo/react-utils/router"
 
-export default function HomeView() {
+export default function DashboardView() {
     const { data, error, isFetching, isLoading } = useQuery<Resource>("get-resources", getResources)
     const { user } = useUserStore(state => [state.user])
 
@@ -32,7 +32,7 @@ export default function HomeView() {
                         {data.destinations.map((destination, index) => (
                             <Link className="no-underline mb-5" to={`/destinations/${destination.id}`} key={index}>
                                 <div
-                                    className="w-full rounded p-5 bg-neutral hover:bg-info hover:text-info-content indicator duration-150 cursor-pointer"
+                                    className="w-full rounded p-5 bg-base-300 hover:bg-info hover:text-info-content indicator duration-150 cursor-pointer"
                                 >
                                     <div className="w-full flex flex-row">
                                         <div className="absolute top-0 left-0 -m-5 h-10 w-10">
@@ -40,11 +40,11 @@ export default function HomeView() {
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 className="absolute top-0 left-0 -m-2 h-12 w-12 text-sky-500"
                                                 viewBox="0 0 24 24"
-                                                stroke-width="1.5"
+                                                strokeWidth="1.5"
                                                 stroke="currentColor"
                                                 fill="none"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
                                             >
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                 <path

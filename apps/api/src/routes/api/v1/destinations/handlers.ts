@@ -137,6 +137,9 @@ export async function newDestination(request: FastifyRequest<NewDestination>, re
 				return reply.code(201).send({ id: destination.id });
 			}
 		} else {
+			console.log('request', request.body)
+			console.log('id', id)
+			console.log('updating', request.body.engine);
 			await prisma.destinationDocker.update({ where: { id }, data: { name, engine, network } });
 			return reply.code(201).send();
 		}

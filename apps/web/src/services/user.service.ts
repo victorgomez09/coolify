@@ -3,7 +3,7 @@ import { send } from "../utils/api.util"
 
 export const getMe = () => {
     return send<unknown, User>({
-        endpoint: '/iam',
+        path: '/iam',
         method: "GET"
     });
 }

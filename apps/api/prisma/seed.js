@@ -95,16 +95,16 @@ async function main() {
 }
 async function reEncryptSecrets() {
 	const { execaCommand } = await import('execa');
-	const image = await execaCommand("docker inspect coolify --format '{{ .Config.Image }}'", {
-		shell: true
-	});
-	const version = image.stdout.split(':')[1] ?? null;
+	// const image = await execaCommand("docker inspect coolify --format '{{ .Config.Image }}'", {
+	// 	shell: true
+	// });
+	// const version = image.stdout.split(':')[1] ?? null;
 	const date = new Date().getTime();
 
 	let backupfile = `/app/db/prod.db_${date}`;
-	if (version) {
-		backupfile = `/app/db/prod.db_${version}_${date}`;
-	}
+	// if (version) {
+	// 	backupfile = `/app/db/prod.db_${version}_${date}`;
+	// }
 	await execaCommand('env | grep "^COOLIFY" | sort > .env', {
 		shell: true
 	});

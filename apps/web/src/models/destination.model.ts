@@ -17,5 +17,8 @@ export interface Destination {
     sshKeyId: string,
     sshLocalPort: number,
     sshKey: SSH,
-    teams: Team[]
+    teams: Team[],
+    application: [],
+    service: [],
+    database: []
 }

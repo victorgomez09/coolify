@@ -11,7 +11,7 @@ type ProxyProps = {
 
 export const getDestination = async (id: string) => {
     const result = await send({
-        endpoint: `/destinations/${id}`,
+        path: `/destinations/${id}`,
         method: "GET"
     });
 
@@ -20,7 +20,7 @@ export const getDestination = async (id: string) => {
 
 export const getDestinationStatus = async (id: string) => {
     const result = await send({
-        endpoint: `/destinations/${id}/status`,
+        path: `/destinations/${id}/status`,
         method: "GET"
     });
 
@@ -29,9 +29,9 @@ export const getDestinationStatus = async (id: string) => {
 
 export const changeDestinationSettings = async ({ id, engine, isCoolifyProxyUsed }: ProxyProps) => {
     const result = await send({
-        endpoint: `/destinations/${id}/settings`,
+        path: `/destinations/${id}/settings`,
         method: "POST",
-        payload: {
+        data: {
             isCoolifyProxyUsed,
             engine
         }
@@ -42,9 +42,9 @@ export const changeDestinationSettings = async ({ id, engine, isCoolifyProxyUsed
 
 export const stopDestinationProxy = async ({ id, engine }: ProxyProps) => {
     const result = await send({
-        endpoint: `/destinations/${id}/stop`,
+        path: `/destinations/${id}/stop`,
         method: "POST",
-        payload: {
+        data: {
             engine
         }
     });
@@ -54,9 +54,9 @@ export const stopDestinationProxy = async ({ id, engine }: ProxyProps) => {
 
 export const startDestinationProxy = async ({ id, engine }: ProxyProps) => {
     const result = await send({
-        endpoint: `/destinations/${id}/start`,
+        path: `/destinations/${id}/start`,
         method: "POST",
-        payload: {
+        data: {
             engine
         }
     });
@@ -66,9 +66,9 @@ export const startDestinationProxy = async ({ id, engine }: ProxyProps) => {
 
 export const forceDestinationProxyRestart = async ({ id, engine, fqdn }: ProxyProps) => {
     const result = await send({
-        endpoint: `/destinations/${id}/restart`,
+        path: `/destinations/${id}/restart`,
         method: "POST",
-        payload: {
+        data: {
             engine,
             fqdn
         }
@@ -79,10 +79,34 @@ export const forceDestinationProxyRestart = async ({ id, engine, fqdn }: ProxyPr
 
 export const updateDestination = async ({ id, destination }: ProxyProps) => {
     const result = await send({
-        endpoint: `/destinations/${id}`,
+        path: `/destinations/${id}`,
         method: "POST",
-        payload: destination
+        data: destination
+    });
+
+    console.log('sended to backend', destination)
+
+    return await result;
+};
+
+export const deleteDestination = async ({ id }: ProxyProps) => {
+    // (`/destinations/${destination.id}`, { id: destination.id });
+    const result = await send({
+        path: `/destinations/${id}`,
+        method: "DELETE",
+        data: { id }
     });
 
     return await result;
-}
+};
+
+export const deleteDestinationForce = async ({ id }: ProxyProps) => {
+    // (`/destinations/${destination.id}`, { id: destination.id });
+    const result = await send({
+        path: `/destinations/${id}`,
+        method: "DELETE",
+        data: { id }
+    });
+
+    return await result;
+};

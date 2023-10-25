@@ -3,7 +3,7 @@ import { Resource } from '../models/resource.model'
 
 export const getResources = async () => {
     const result = await send<unknown, Resource>({
-        endpoint: '/resources',
+        path: '/resources',
         method: "GET"
     });
 
